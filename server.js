@@ -1,3 +1,36 @@
+let timeLeft = 60;
+let isDrawing = false;
+
+function startTimer() {
+    const timerElement = document.getElementById('timer');
+    const statusText = document.getElementById('status-text');
+
+    const countdown = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            triggerDrawPhase(); // Function to show drawing animation
+        } else {
+            timeLeft--;
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+            timerElement.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+    }, 1000);
+}
+
+function triggerDrawPhase() {
+    isDrawing = true;
+    document.getElementById('grid-section').style.display = 'none';
+    document.getElementById('draw-section').style.display = 'block';
+    
+    // After 10 seconds of showing results, reset to betting
+    setTimeout(() => {
+        location.reload(); 
+    }, 10000);
+}
+
+// Start the game loop
+window.onload = startTimer;
 const { Telegraf } = require('telegraf');
 const express = require('express');
 const path = require('path');

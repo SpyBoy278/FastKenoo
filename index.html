@@ -7,130 +7,160 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { 
-            --bg-main: #13171a; 
-            --bg-card: #20262b; 
-            --accent-green: #2ecc71; 
-            --hot-red: #ff4757; 
-            --cold-blue: #2e86de; 
-        }
-        body { background-color: var(--bg-main); color: #ffffff; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        :root { --bg: #13171a; --panel: #20262b; --green: #2ecc71; --hot: #ff4757; --cold: #2e86de; }
+        body { background-color: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 0; }
         
-        /* Glass Header */
-        .header-container { padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .id-pill { 
-            background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 30px; padding: 4px 12px; font-size: 11px; display: flex; align-items: center; gap: 8px;
-        }
+        /* Header & ID */
+        .header-ui { padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .id-badge { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 15px; font-size: 11px; display: flex; gap: 8px; }
 
-        /* Nav Bar */
-        .nav-bar { display: flex; justify-content: space-around; border-top: 1px solid #2c3238; border-bottom: 1px solid #2c3238; padding: 10px 0; margin: 15px 0; }
-        .nav-item { font-size: 14px; font-weight: bold; color: #9ba3a9; display: flex; align-items: center; gap: 5px; cursor: pointer; text-transform: uppercase; }
-        .nav-item.active { color: var(--accent-green); border-bottom: 2px solid var(--accent-green); padding-bottom: 2px; }
-
-        /* Keno Grid */
-        .keno-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; padding: 0 10px; }
-        .num-box { background: #2c3238; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: 700; font-size: 14px; color: #9ba3a9; position: relative; }
-        .num-box.selected { background: var(--accent-green); color: #13171a; }
+        /* Grid & Tabs */
+        .keno-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; padding: 10px; }
+        .num-cell { background: #2c3238; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: bold; font-size: 14px; color: #95a5a6; position: relative; }
+        .num-cell.selected { background: var(--green); color: black; }
+        .num-cell.hot::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; background: var(--hot); border-radius: 50%; }
         
-        /* Drawing UI */
-        .main-ball { width: 80px; height: 80px; background: radial-gradient(circle at 30% 30%, #34495e, #1a252f); border: 4px solid #4a5d6e; border-radius: 50%; margin: 10px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; }
-        .ball-history { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; padding: 0 15px; }
-        .history-item { width: 30px; height: 30px; background: #2c3e50; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; border: 1px solid #4a5d6e; }
+        .nav-tabs { display: flex; justify-content: space-around; border-bottom: 1px solid #2c3238; padding: 10px 0; background: var(--bg); }
+        .tab-link { font-size: 13px; font-weight: bold; color: #95a5a6; text-transform: uppercase; cursor: pointer; padding-bottom: 5px; }
+        .tab-link.active { color: var(--green); border-bottom: 2px solid var(--green); }
 
-        /* Action Buttons */
-        .btn-bet-main { background: linear-gradient(180deg, #3d5a4a 0%, #243b2f 100%); width: 95%; padding: 16px; border-radius: 5px; color: #8fa397; font-size: 22px; font-weight: 900; border: none; margin: 20px auto; display: block; }
+        /* Betting Controls */
+        .bet-controls { background: var(--panel); margin: 10px; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+        .btn-action { background: #2c3238; width: 45px; height: 40px; border-radius: 5px; font-size: 20px; font-weight: bold; }
+        .bet-btn-main { background: linear-gradient(180deg, #3d5a4a 0%, #243b2f 100%); width: 95%; margin: 0 auto 15px; padding: 16px; border-radius: 6px; color: #8fa397; font-size: 24px; font-weight: 900; display: block; }
+
+        /* Draw View */
+        .main-ball { width: 85px; height: 85px; background: radial-gradient(circle at 30% 30%, #34495e, #1a252f); border: 4px solid #5d6d7e; border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; }
+        .history-ball { width: 32px; height: 32px; background: #2c3e50; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; border: 1px solid #5d6d7e; }
         
         .hidden { display: none; }
-        .hot::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; background: var(--hot-red); border-radius: 50%; }
-        .cold::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; background: var(--cold-blue); border-radius: 50%; }
     </style>
 </head>
 <body>
 
-    <div class="header-container">
-        <div id="countdown" class="text-2xl font-mono">00:60</div>
-        <div class="id-pill">
+    <div class="header-ui">
+        <div id="timer" class="text-3xl font-mono">00:60</div>
+        <div class="id-badge">
             <span class="text-yellow-500 font-bold">0 ETB</span>
             <span class="opacity-40">ID: 877462616</span>
             <span class="text-green-500">✔</span>
         </div>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-item active">▶ Game</div>
-        <div class="nav-item">↺ History</div>
-        <div class="nav-item">✔ Results</div>
-        <div class="nav-item">📊 Statistics</div>
-    </div>
+    <div id="main-content">
+        <div id="keno-grid" class="keno-grid"></div>
 
-    <div id="game-view">
-        <div class="text-center mb-4">
-            <h2 class="text-lg font-bold">Choose 10 numbers</h2>
-            <p class="text-green-500 text-xs">From 1 to 80</p>
+        <div class="bet-controls">
+            <button class="btn-action" onclick="changeBet(-2)">-</button>
+            <div class="flex-grow text-center text-xl font-bold"><span id="bet-amount">2</span> ETB</div>
+            <button class="btn-action" onclick="changeBet(2)">+</button>
+            <button class="text-green-500 font-bold px-2" onclick="changeBet('x2')">X2</button>
+            <button class="text-green-500 font-bold px-2" onclick="changeBet('max')">MAX</button>
         </div>
-        <div id="grid-container" class="keno-grid"></div>
-        <button class="btn-bet-main">BET</button>
+
+        <button class="bet-btn-main" id="bet-trigger">BET</button>
+
+        <div class="nav-tabs">
+            <div class="tab-link active" onclick="showTab('game')">▶ Game</div>
+            <div class="tab-link" onclick="showTab('history')">↺ History</div>
+            <div class="tab-link" onclick="showTab('results')">✔ Results</div>
+            <div class="tab-link" onclick="showTab('stats')">📊 Statistics</div>
+        </div>
+
+        <div id="tab-game" class="p-4">
+            <div class="bg-[#20262b] p-4 rounded-lg opacity-40 text-center text-sm">No active tickets</div>
+        </div>
+        
+        <div id="tab-history" class="p-4 hidden">
+            <div class="space-y-2">
+                <div class="bg-[#20262b] p-3 rounded flex justify-between text-xs">
+                    <span>Ticket #8774...</span>
+                    <span class="text-yellow-500 font-bold">Bet: 2 ETB</span>
+                    <span class="text-gray-400">Waiting</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-results" class="p-4 hidden">
+            <div class="text-center text-xs opacity-50 uppercase tracking-widest">Last Round Results</div>
+            <div id="last-round-balls" class="grid grid-cols-10 gap-1 mt-4"></div>
+        </div>
     </div>
 
-    <div id="draw-view" class="hidden text-center">
+    <div id="draw-view" class="hidden text-center p-6">
         <div class="main-ball" id="active-num">--</div>
-        <div id="history-grid" class="ball-history mt-4"></div>
-        <div class="mt-10 opacity-40">
-            <div class="text-green-500 text-3xl mb-1">✔</div>
+        <div id="ball-history" class="grid grid-cols-10 gap-2 mt-6"></div>
+        <div class="mt-20 opacity-30">
+            <div class="text-green-500 text-4xl mb-2">✔</div>
             <h2 class="text-xl font-bold">FAIRNESS</h2>
             <p class="text-[8px] tracking-[4px]">ATLAS-V GAMING</p>
         </div>
     </div>
 
     <script>
-        const grid = document.getElementById('grid-container');
-        const timerLabel = document.getElementById('countdown');
+        let currentBet = 2;
         let timeLeft = 60;
+        const grid = document.getElementById('keno-grid');
+        const betDisp = document.getElementById('bet-amount');
 
         // Init Grid
-        for (let i = 1; i <= 80; i++) {
-            const box = document.createElement('div');
-            box.className = 'num-box';
-            box.innerText = i;
-            if ([3, 11, 30, 53].includes(i)) box.classList.add('hot');
-            if ([5, 10, 23, 78].includes(i)) box.classList.add('cold');
-            box.onclick = () => box.classList.toggle('selected');
-            grid.appendChild(box);
+        for(let i=1; i<=80; i++) {
+            const c = document.createElement('div');
+            c.className = 'num-cell';
+            c.innerText = i;
+            if([3, 11, 30, 52, 53, 78].includes(i)) c.classList.add(i % 2 === 0 ? 'cold' : 'hot');
+            c.onclick = () => c.classList.toggle('selected');
+            grid.appendChild(c);
         }
 
-        // Timer Loop
-        const gameLoop = setInterval(() => {
-            timeLeft--;
-            timerLabel.innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
-            if (timeLeft <= 0) {
-                clearInterval(gameLoop);
-                startDrawing();
-            }
-        }, 1000);
-
-        function startDrawing() {
-            document.getElementById('game-view').classList.add('hidden');
-            document.getElementById('draw-view').classList.remove('hidden');
+        // Betting Logic
+        function changeBet(val) {
+            if(val === 'x2') currentBet *= 2;
+            else if(val === 'max') currentBet = 1000;
+            else currentBet += val;
             
-            let count = 0;
-            const drawInterval = setInterval(() => {
-                const pick = Math.floor(Math.random() * 80) + 1;
-                document.getElementById('active-num').innerText = pick;
-                
-                const b = document.createElement('div');
-                b.className = 'history-item';
-                b.innerText = pick;
-                document.getElementById('history-grid').appendChild(b);
-                
-                count++;
-                if (count >= 20) {
-                    clearInterval(drawInterval);
-                    // RETURN TO GAME: Wait 5 seconds to show results, then reload
-                    setTimeout(() => location.reload(), 5000);
-                }
-            }, 400);
+            if(currentBet < 2) currentBet = 2;
+            if(currentBet > 1000) currentBet = 1000;
+            betDisp.innerText = currentBet;
         }
+
+        // Tab Logic
+        function showTab(tab) {
+            ['game', 'history', 'results', 'stats'].forEach(t => {
+                const el = document.getElementById('tab-' + t);
+                if(el) el.classList.add('hidden');
+            });
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Slow Drawing Logic
+        function startDraw() {
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('draw-view').classList.remove('hidden');
+            let drawn = [];
+            const interval = setInterval(() => {
+                let n = Math.floor(Math.random() * 80) + 1;
+                if(!drawn.includes(n)) {
+                    drawn.push(n);
+                    document.getElementById('active-num').innerText = n;
+                    const b = document.createElement('div');
+                    b.className = 'history-ball'; b.innerText = n;
+                    document.getElementById('ball-history').appendChild(b);
+                    if(drawn.length >= 20) {
+                        clearInterval(interval);
+                        setTimeout(() => location.reload(), 6000);
+                    }
+                }
+            }, 800); // Made slower (800ms) for better visibility
+        }
+
+        const timerLoop = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
+            if(timeLeft <= 0) { clearInterval(timerLoop); startDraw(); }
+        }, 1000);
     </script>
 </body>
-</html>
+        </html>

@@ -8,38 +8,46 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root { --bg: #13171a; --panel: #20262b; --green: #2ecc71; --hot: #ff4757; --cold: #2e86de; }
-        body { background-color: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
         
-        /* Header & ID */
+        /* Header Section */
         .header-ui { padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .id-badge { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 15px; font-size: 11px; display: flex; gap: 8px; }
+        .id-badge { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 15px; font-size: 11px; display: flex; gap: 8px; align-items: center; }
 
-        /* Grid & Tabs */
+        /* Navigation Tabs */
+        .nav-tabs { display: flex; justify-content: space-around; border-top: 1px solid #2c3238; border-bottom: 1px solid #2c3238; padding: 12px 0; margin-top: 10px; }
+        .tab-link { font-size: 13px; font-weight: bold; color: #95a5a6; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .tab-link.active { color: var(--green); border-bottom: 2px solid var(--green); padding-bottom: 2px; }
+
+        /* Keno Grid */
         .keno-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; padding: 10px; }
         .num-cell { background: #2c3238; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: bold; font-size: 14px; color: #95a5a6; position: relative; }
         .num-cell.selected { background: var(--green); color: black; }
         .num-cell.hot::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; background: var(--hot); border-radius: 50%; }
-        
-        .nav-tabs { display: flex; justify-content: space-around; border-bottom: 1px solid #2c3238; padding: 10px 0; background: var(--bg); }
-        .tab-link { font-size: 13px; font-weight: bold; color: #95a5a6; text-transform: uppercase; cursor: pointer; padding-bottom: 5px; }
-        .tab-link.active { color: var(--green); border-bottom: 2px solid var(--green); }
+        .num-cell.cold::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; background: var(--cold); border-radius: 50%; }
 
         /* Betting Controls */
-        .bet-controls { background: var(--panel); margin: 10px; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
-        .btn-action { background: #2c3238; width: 45px; height: 40px; border-radius: 5px; font-size: 20px; font-weight: bold; }
-        .bet-btn-main { background: linear-gradient(180deg, #3d5a4a 0%, #243b2f 100%); width: 95%; margin: 0 auto 15px; padding: 16px; border-radius: 6px; color: #8fa397; font-size: 24px; font-weight: 900; display: block; }
+        .bet-area { background: var(--panel); margin: 0 10px; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 8px; }
+        .ctrl-btn { background: #2c3238; width: 48px; height: 42px; border-radius: 4px; font-size: 24px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .bet-main-btn { background: #2d4a3a; width: calc(100% - 20px); margin: 10px auto; padding: 18px; border-radius: 4px; color: #ffffff; font-size: 26px; font-weight: 900; text-align: center; border: none; text-transform: uppercase; }
 
-        /* Draw View */
-        .main-ball { width: 85px; height: 85px; background: radial-gradient(circle at 30% 30%, #34495e, #1a252f); border: 4px solid #5d6d7e; border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; }
-        .history-ball { width: 32px; height: 32px; background: #2c3e50; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; border: 1px solid #5d6d7e; }
-        
+        /* Drawing Animation UI */
+        .draw-ball-main { width: 85px; height: 85px; background: radial-gradient(circle at 30% 30%, #34495e, #1a252f); border: 4px solid #5d6d7e; border-radius: 50%; margin: 15px auto; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: bold; }
+        .small-ball { width: 32px; height: 32px; background: #2c3e50; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; border: 1px solid #5d6d7e; }
+
+        /* Tab Content Containers */
+        .tab-content { padding: 15px; }
         .hidden { display: none; }
+        
+        /* Stats Styling */
+        .stat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 14px; }
+        .stat-bar { height: 6px; background: var(--green); border-radius: 3px; flex-grow: 1; }
     </style>
 </head>
 <body>
 
     <div class="header-ui">
-        <div id="timer" class="text-3xl font-mono">00:60</div>
+        <div id="timer" class="text-3xl font-mono text-white">00:60</div>
         <div class="id-badge">
             <span class="text-yellow-500 font-bold">0 ETB</span>
             <span class="opacity-40">ID: 877462616</span>
@@ -47,120 +55,121 @@
         </div>
     </div>
 
-    <div id="main-content">
+    <div id="game-container">
         <div id="keno-grid" class="keno-grid"></div>
 
-        <div class="bet-controls">
-            <button class="btn-action" onclick="changeBet(-2)">-</button>
-            <div class="flex-grow text-center text-xl font-bold"><span id="bet-amount">2</span> ETB</div>
-            <button class="btn-action" onclick="changeBet(2)">+</button>
-            <button class="text-green-500 font-bold px-2" onclick="changeBet('x2')">X2</button>
-            <button class="text-green-500 font-bold px-2" onclick="changeBet('max')">MAX</button>
+        <div class="bet-area">
+            <button class="ctrl-btn" onclick="updateBet(-2)">-</button>
+            <div class="flex-grow text-center text-2xl font-bold"><span id="display-bet">2</span></div>
+            <button class="ctrl-btn" onclick="updateBet(2)">+</button>
+            <button class="text-green-500 font-bold px-2" onclick="updateBet('x2')">X2</button>
+            <button class="text-green-500 font-bold px-2" onclick="updateBet('max')">MAX</button>
         </div>
 
-        <button class="bet-btn-main" id="bet-trigger">BET</button>
+        <button class="bet-main-btn">BET</button>
 
         <div class="nav-tabs">
-            <div class="tab-link active" onclick="showTab('game')">▶ Game</div>
-            <div class="tab-link" onclick="showTab('history')">↺ History</div>
-            <div class="tab-link" onclick="showTab('results')">✔ Results</div>
-            <div class="tab-link" onclick="showTab('stats')">📊 Statistics</div>
+            <div class="tab-link active" onclick="switchTab(event, 'game-info')">▶ Game</div>
+            <div class="tab-link" onclick="switchTab(event, 'history-info')">↺ History</div>
+            <div class="tab-link" onclick="switchTab(event, 'results-info')">✔ Results</div>
+            <div class="tab-link" onclick="switchTab(event, 'stats-info')">📊 Statistics</div>
         </div>
 
-        <div id="tab-game" class="p-4">
-            <div class="bg-[#20262b] p-4 rounded-lg opacity-40 text-center text-sm">No active tickets</div>
+        <div id="game-info" class="tab-content">
+            <div class="bg-[#20262b] p-4 rounded text-center opacity-40 text-sm">Waiting for selections...</div>
         </div>
-        
-        <div id="tab-history" class="p-4 hidden">
-            <div class="space-y-2">
-                <div class="bg-[#20262b] p-3 rounded flex justify-between text-xs">
-                    <span>Ticket #8774...</span>
-                    <span class="text-yellow-500 font-bold">Bet: 2 ETB</span>
-                    <span class="text-gray-400">Waiting</span>
-                </div>
+
+        <div id="history-info" class="tab-content hidden">
+            <div class="bg-[#20262b] p-3 rounded flex justify-between text-xs mb-2">
+                <span class="text-green-500">3***7</span>
+                <span>Bet <span id="hist-bet-val">2</span></span>
+                <span class="text-yellow-500">Waiting</span>
             </div>
         </div>
 
-        <div id="tab-results" class="p-4 hidden">
-            <div class="text-center text-xs opacity-50 uppercase tracking-widest">Last Round Results</div>
-            <div id="last-round-balls" class="grid grid-cols-10 gap-1 mt-4"></div>
+        <div id="results-info" class="tab-content hidden text-center">
+            <p class="text-xs opacity-50 mb-4">LATEST ROUND RESULTS</p>
+            <div id="prev-results" class="grid grid-cols-10 gap-2"></div>
+        </div>
+
+        <div id="stats-info" class="tab-content hidden">
+            <div class="stat-row"><span>1</span><div class="stat-bar" style="width: 60%"></div><span>24</span></div>
+            <div class="stat-row"><span>2</span><div class="stat-bar" style="width: 45%"></div><span>18</span></div>
+            <div class="stat-row"><span>3</span><div class="stat-bar" style="width: 80%"></div><span>34</span></div>
         </div>
     </div>
 
-    <div id="draw-view" class="hidden text-center p-6">
-        <div class="main-ball" id="active-num">--</div>
-        <div id="ball-history" class="grid grid-cols-10 gap-2 mt-6"></div>
+    <div id="draw-container" class="hidden text-center p-6">
+        <div class="draw-ball-main" id="current-ball">--</div>
+        <div id="draw-history" class="grid grid-cols-10 gap-2"></div>
         <div class="mt-20 opacity-30">
             <div class="text-green-500 text-4xl mb-2">✔</div>
             <h2 class="text-xl font-bold">FAIRNESS</h2>
-            <p class="text-[8px] tracking-[4px]">ATLAS-V GAMING</p>
+            <p class="text-[8px] tracking-[4px] uppercase">Atlas-V Gaming</p>
         </div>
     </div>
 
     <script>
-        let currentBet = 2;
-        let timeLeft = 60;
+        let bet = 2;
+        let timerVal = 60;
         const grid = document.getElementById('keno-grid');
-        const betDisp = document.getElementById('bet-amount');
+        const betLabel = document.getElementById('display-bet');
 
-        // Init Grid
+        // Setup Grid with Hot/Cold spots
         for(let i=1; i<=80; i++) {
-            const c = document.createElement('div');
-            c.className = 'num-cell';
-            c.innerText = i;
-            if([3, 11, 30, 52, 53, 78].includes(i)) c.classList.add(i % 2 === 0 ? 'cold' : 'hot');
-            c.onclick = () => c.classList.toggle('selected');
-            grid.appendChild(c);
+            const cell = document.createElement('div');
+            cell.className = 'num-cell';
+            cell.innerText = i;
+            if([3, 11, 30, 53].includes(i)) cell.classList.add('hot');
+            if([5, 10, 23, 78].includes(i)) cell.classList.add('cold');
+            cell.onclick = () => cell.classList.toggle('selected');
+            grid.appendChild(cell);
         }
 
-        // Betting Logic
-        function changeBet(val) {
-            if(val === 'x2') currentBet *= 2;
-            else if(val === 'max') currentBet = 1000;
-            else currentBet += val;
+        // Betting Logic (Max 1000)
+        function updateBet(type) {
+            if(type === 'x2') bet *= 2;
+            else if(type === 'max') bet = 1000;
+            else bet += type;
             
-            if(currentBet < 2) currentBet = 2;
-            if(currentBet > 1000) currentBet = 1000;
-            betDisp.innerText = currentBet;
+            if(bet < 2) bet = 2;
+            if(bet > 1000) bet = 1000;
+            betLabel.innerText = bet;
+            document.getElementById('hist-bet-val').innerText = bet;
         }
 
-        // Tab Logic
-        function showTab(tab) {
-            ['game', 'history', 'results', 'stats'].forEach(t => {
-                const el = document.getElementById('tab-' + t);
-                if(el) el.classList.add('hidden');
-            });
-            document.getElementById('tab-' + tab).classList.remove('hidden');
+        // Tab Navigation
+        function switchTab(e, id) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
-            event.target.classList.add('active');
+            document.getElementById(id).classList.remove('hidden');
+            e.currentTarget.classList.add('active');
         }
 
-        // Slow Drawing Logic
-        function startDraw() {
-            document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('draw-view').classList.remove('hidden');
-            let drawn = [];
-            const interval = setInterval(() => {
-                let n = Math.floor(Math.random() * 80) + 1;
-                if(!drawn.includes(n)) {
-                    drawn.push(n);
-                    document.getElementById('active-num').innerText = n;
-                    const b = document.createElement('div');
-                    b.className = 'history-ball'; b.innerText = n;
-                    document.getElementById('ball-history').appendChild(b);
-                    if(drawn.length >= 20) {
-                        clearInterval(interval);
-                        setTimeout(() => location.reload(), 6000);
-                    }
+        // Slow Draw & Reset
+        function triggerDraw() {
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('draw-container').classList.remove('hidden');
+            let count = 0;
+            const drawInterval = setInterval(() => {
+                const num = Math.floor(Math.random() * 80) + 1;
+                document.getElementById('current-ball').innerText = num;
+                const b = document.createElement('div');
+                b.className = 'small-ball'; b.innerText = num;
+                document.getElementById('draw-history').appendChild(b);
+                count++;
+                if(count >= 20) {
+                    clearInterval(drawInterval);
+                    setTimeout(() => location.reload(), 7000); // Return to game
                 }
-            }, 800); // Made slower (800ms) for better visibility
+            }, 900); // Slower draw speed
         }
 
-        const timerLoop = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timer').innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
-            if(timeLeft <= 0) { clearInterval(timerLoop); startDraw(); }
+        const clock = setInterval(() => {
+            timerVal--;
+            document.getElementById('timer').innerText = `00:${timerVal < 10 ? '0'+timerVal : timerVal}`;
+            if(timerVal <= 0) { clearInterval(clock); triggerDraw(); }
         }, 1000);
     </script>
 </body>
-        </html>
+</html>

@@ -7,150 +7,161 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-main: #13171a;
-            --bg-panel: #20262b;
-            --accent-green: #2ecc71;
-            --hot-red: #ff4757;
-            --cold-blue: #2e86de;
+        :root { 
+            --bg-main: #13171a; 
+            --bg-card: #20262b; 
+            --accent-green: #2ecc71; 
+            --hot-red: #ff4757; 
+            --cold-blue: #2e86de; 
         }
-        body { background-color: var(--bg-main); color: #fff; font-family: sans-serif; margin: 0; padding: 10px; }
+        body { background-color: var(--bg-main); color: #ffffff; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 12px; overflow-x: hidden; }
         
-        /* Header Glass Effect */
-        .id-glass { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px; padding: 4px 15px; font-size: 12px;
-            display: flex; align-items: center; gap: 8px;
+        /* Glass Header Section */
+        .glass-header { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px; }
+        .id-pill { 
+            background: rgba(255, 255, 255, 0.07); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 30px; padding: 5px 15px; font-size: 11px; 
+            display: flex; align-items: center; gap: 10px;
         }
 
-        /* Number Grid */
-        .num-cell { 
+        /* Number Grid Pixels */
+        .keno-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+        .num-box { 
             background: #2c3238; aspect-ratio: 1/1; display: flex; 
-            align-items: center; justify-content: center;
-            border-radius: 4px; font-weight: bold; font-size: 14px; color: #95a5a6;
-            position: relative; cursor: pointer;
+            align-items: center; justify-content: center; border-radius: 4px; 
+            font-weight: 700; font-size: 14px; color: #9ba3a9; position: relative; 
         }
-        .num-cell.selected { background: var(--accent-green); color: #000; }
-        .num-cell.hot::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; background: var(--hot-red); border-radius: 50%; box-shadow: 0 0 5px var(--hot-red); }
-        .num-cell.cold::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; background: var(--cold-blue); border-radius: 50%; }
+        .num-box.selected { background: var(--accent-green); color: #13171a; }
+        
+        /* Hot & Cold Dots */
+        .hot::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; background: var(--hot-red); border-radius: 50%; box-shadow: 0 0 5px var(--hot-red); }
+        .cold::after { content: ''; position: absolute; top: 3px; right: 3px; width: 6px; height: 6px; background: var(--cold-blue); border-radius: 50%; }
 
-        /* Drawing Animation */
-        .draw-ball {
-            width: 40px; height: 40px; background: radial-gradient(circle at 30% 30%, #5d6d7e, #2c3e50);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; border: 2px solid #34495e; box-shadow: inset -3px -3px 5px rgba(0,0,0,0.5);
+        /* Drawing Animation UI */
+        .main-ball { 
+            width: 85px; height: 85px; background: radial-gradient(circle at 30% 30%, #34495e, #1a252f); 
+            border: 4px solid #4a5d6e; border-radius: 50%; margin: 15px auto; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 38px; font-weight: 800; text-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
-        .main-ball {
-            width: 80px; height: 80px; font-size: 32px; background: radial-gradient(circle at 30% 30%, #34495e, #1a252f);
-            border: 4px solid #5d6d7e; margin: 20px auto;
+        .history-ball { 
+            width: 32px; height: 32px; background: #2c3e50; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 12px; font-weight: bold; border: 1px solid #4a5d6e;
         }
 
-        .btn-bet { 
-            background: linear-gradient(180deg, #3d5a4a 0%, #243b2f 100%);
-            width: 100%; padding: 16px; border-radius: 5px; border: none;
-            color: #8fa397; font-size: 22px; font-weight: 800;
+        /* Large Action Button */
+        .btn-bet-action { 
+            background: linear-gradient(180deg, #3d5a4a 0%, #243b2f 100%); 
+            width: 100%; padding: 18px; border-radius: 5px; 
+            color: #8fa397; font-size: 24px; font-weight: 900; border: none; 
+            margin-top: 20px; transition: opacity 0.2s;
         }
+        .btn-bet-action:active { opacity: 0.8; }
         
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="flex flex-col items-center gap-2 mb-4">
-        <div id="timer" class="text-2xl font-mono text-white opacity-80">00:60</div>
-        <div class="id-glass">
-            <span class="text-yellow-500 font-bold">0 ETB</span>
-            <span class="opacity-50">ID: 877462616</span>
+    <div class="glass-header">
+        <div id="countdown" class="text-3xl font-mono">00:60</div>
+        <div class="id-pill">
+            <span class="text-yellow-500 font-bold text-sm">0 ETB</span>
+            <span class="opacity-40">ID: 877462616</span>
             <span class="text-green-500">✔</span>
         </div>
     </div>
 
-    <div id="betting-phase">
+    <div id="play-view">
         <div class="text-center mb-4">
-            <h1 class="text-xl font-bold">Choose 10 numbers</h1>
-            <p class="text-green-500 text-sm">From 1 to 80</p>
+            <h2 class="text-lg font-bold uppercase">Choose 10 numbers</h2>
+            <p class="text-green-500 text-xs font-semibold">From 1 to 80</p>
         </div>
 
-        <div id="keno-grid" class="grid grid-cols-10 gap-1.5 mb-6"></div>
+        <div id="main-grid" class="keno-grid"></div>
 
-        <div class="flex items-center gap-2 mb-4 bg-[#20262b] p-3 rounded-lg">
-            <button class="bg-gray-700 w-10 h-10 rounded text-xl">-</button>
+        <div class="flex items-center gap-2 mt-6 bg-[#20262b] p-3 rounded-lg">
+            <button class="bg-gray-700 w-12 h-10 rounded text-xl font-bold">-</button>
             <div class="flex-grow text-center text-xl font-bold">2</div>
-            <button class="bg-gray-700 w-10 h-10 rounded text-xl">+</button>
-            <button class="text-green-500 font-bold px-2">X2</button>
-            <button class="text-green-500 font-bold px-2">MAX</button>
+            <button class="bg-gray-700 w-12 h-10 rounded text-xl font-bold">+</button>
+            <button class="text-green-500 font-bold px-3">X2</button>
+            <button class="text-green-500 font-bold px-3">MAX</button>
         </div>
-        <button class="btn-bet">BET</button>
+        <button class="btn-bet-action">BET</button>
     </div>
 
-    <div id="drawing-phase" class="hidden text-center">
-        <div class="main-ball draw-ball" id="current-draw">--</div>
-        <div id="results-grid" class="grid grid-cols-10 gap-2 mt-4"></div>
-        <div class="mt-8">
-            <div class="flex justify-center mb-4"><span class="text-green-500 text-4xl">✔</span></div>
-            <h2 class="text-2xl font-bold mb-8">FAIRNESS</h2>
-            <p class="opacity-30 text-xs">ATLAS-V GAMING</p>
+    <div id="draw-view" class="hidden text-center">
+        <div class="main-ball" id="active-num">--</div>
+        <div id="history-grid" class="grid grid-cols-10 gap-2 mt-6"></div>
+        
+        <div class="mt-12 opacity-50">
+            <div class="text-green-500 text-4xl mb-2">✔</div>
+            <h2 class="text-2xl font-bold tracking-tight">FAIRNESS</h2>
+            <p class="text-[9px] mt-6 tracking-[5px] uppercase">Atlas-V Gaming</p>
         </div>
     </div>
 
     <script>
-        const grid = document.getElementById('keno-grid');
-        const resultsGrid = document.getElementById('results-grid');
-        let timeLeft = 60;
+        const gridContainer = document.getElementById('main-grid');
+        const timerLabel = document.getElementById('countdown');
+        let secondsLeft = 60;
 
-        // 1. Generate the 1-80 Grid
+        // 1. Initialize Numbers
         for (let i = 1; i <= 80; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'num-cell';
-            cell.innerText = i;
-            if ([3, 11, 30, 53].includes(i)) cell.classList.add('hot');
-            if ([5, 10, 23, 78].includes(i)) cell.classList.add('cold');
+            const el = document.createElement('div');
+            el.className = 'num-box';
+            el.innerText = i;
             
-            cell.onclick = () => cell.classList.toggle('selected');
-            grid.appendChild(cell);
+            // Add Hot/Cold markers (matching your screenshot)
+            if ([3, 11, 30, 53].includes(i)) el.classList.add('hot');
+            if ([5, 10, 23, 78].includes(i)) el.classList.add('cold');
+            
+            el.onclick = () => el.classList.toggle('selected');
+            gridContainer.appendChild(el);
         }
 
-        // 2. Timer Logic
-        const timerInterval = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timer').innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
+        // 2. Timer Sequence
+        const clock = setInterval(() => {
+            secondsLeft--;
+            timerLabel.innerText = `00:${secondsLeft < 10 ? '0'+secondsLeft : secondsLeft}`;
             
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                startDrawing();
+            if (secondsLeft <= 0) {
+                clearInterval(clock);
+                switchToDraw();
             }
         }, 1000);
 
-        // 3. Drawing Phase Logic
-        function startDrawing() {
-            document.getElementById('betting-phase').classList.add('hidden');
-            document.getElementById('drawing-phase').classList.remove('hidden');
+        // 3. Drawing Animation Logic
+        function switchToDraw() {
+            document.getElementById('play-view').classList.add('hidden');
+            document.getElementById('draw-view').classList.remove('hidden');
             
-            let drawnCount = 0;
-            const drawNumbers = [];
-            while(drawNumbers.length < 20) {
-                let r = Math.floor(Math.random() * 80) + 1;
-                if(!drawNumbers.includes(r)) drawNumbers.push(r);
-            }
+            let drawPool = [];
+            let found = 0;
 
-            const drawInterval = setInterval(() => {
-                if (drawnCount < 20) {
-                    const num = drawNumbers[drawnCount];
-                    document.getElementById('current-draw').innerText = num;
+            const drawCycle = setInterval(() => {
+                let pick = Math.floor(Math.random() * 80) + 1;
+                
+                if (!drawPool.includes(pick)) {
+                    drawPool.push(pick);
+                    document.getElementById('active-num').innerText = pick;
                     
                     const ball = document.createElement('div');
-                    ball.className = 'draw-ball text-xs h-8 w-8';
-                    ball.innerText = num;
-                    resultsGrid.appendChild(ball);
-                    
-                    drawnCount++;
-                } else {
-                    clearInterval(drawInterval);
-                    setTimeout(() => location.reload(), 5000); // Reset game after 5s
+                    ball.className = 'history-ball';
+                    ball.innerText = pick;
+                    document.getElementById('history-grid').appendChild(ball);
+                    found++;
                 }
-            }, 500); // Speed of balls appearing
+
+                if (found >= 20) {
+                    clearInterval(drawCycle);
+                    // Reload game after results show for 8 seconds
+                    setTimeout(() => location.reload(), 8000);
+                }
+            }, 500);
         }
     </script>
 </body>
-            </html>
+</html>

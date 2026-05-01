@@ -16,7 +16,7 @@ bot.start((ctx) => {
     ctx.reply('Welcome to FastKeno! Click the button below to play.', {
         reply_markup: {
             inline_keyboard: [[
-                { text: 'Play FastKeno', web_app: { url: 'https://YOUR-RENDER-URL.onrender.com' } }
+                { text: 'Play FastKeno', web_app: { url: 'https://fastkenoo-1.onrender.com/' } }
             ]]
         }
     });

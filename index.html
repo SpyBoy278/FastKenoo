@@ -1,1 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastKeno Interface</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #1a1e22; color: white; font-family: sans-serif; }
+        .bg-dark { background-color: #2c3238; }
+        .number-box { position: relative; background: #2c3238; border-radius: 4px; padding: 10px 5px; text-align: center; font-size: 14px; font-weight: bold; }
+        
+        /* The Hot/Cold Dots */
+        .hot::after { content: ''; position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #e74c3c; border-radius: 50%; }
+        .cold::after { content: ''; position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #3498db; border-radius: 50%; }
+        
+        /* Betting Buttons */
+        .btn-bet { background: linear-gradient(to right, #27ae60, #2ecc71); font-weight: bold; padding: 15px; width: 100%; border-radius: 6px; }
+    </style>
+</head>
+<body class="p-2">
 
+    <header class="flex justify-between items-center mb-4 bg-dark p-3 rounded-lg">
+        <div class="font-bold text-green-500">FAST KENO</div>
+        <div class="flex items-center gap-2">
+            <span class="text-sm">0 ETB</span>
+            <button class="bg-blue-500 px-3 py-1 rounded text-xs">+ Deposit</button>
+            <div class="w-8 h-8 bg-gray-600 rounded-full"></div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-10 gap-1.5 mb-6">
+        <div id="grid-container" class="contents"></div>
+    </div>
+
+    <div class="flex items-center gap-2 mb-4 bg-dark p-3 rounded-lg">
+        <button class="bg-gray-600 px-4 py-2 rounded">-</button>
+        <div class="flex-grow text-center text-xl font-bold">2</div>
+        <button class="bg-gray-600 px-4 py-2 rounded">+</button>
+        <button class="bg-green-700 px-4 py-2 rounded text-xs">X2</button>
+        <button class="bg-green-700 px-4 py-2 rounded text-xs">MAX</button>
+    </div>
+
+    <button class="btn-bet">BET</button>
+
+    <nav class="flex justify-around mt-6 border-t border-gray-700 pt-4">
+        <span class="text-green-500 border-b-2 border-green-500 pb-1">GAME</span>
+        <span>HISTORY</span>
+        <span>RESULTS</span>
+    </nav>
+
+    <script>
+        // Generate Numbers 1-80
+        const container = document.getElementById('grid-container');
+        for (let i = 1; i <= 80; i++) {
+            const div = document.createElement('div');
+            div.className = 'number-box';
+            div.innerText = i;
+            // Example: Adding hot/cold logic
+            if (i === 3 || i === 11 || i === 30) div.classList.add('hot');
+            if (i === 5 || i === 10 || i === 23) div.classList.add('cold');
+            container.appendChild(div);
+        }
+    </script>
+</body>
+</html>
